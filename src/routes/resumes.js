@@ -330,10 +330,11 @@ router.get('/:id/generate-docx', authenticate, async (req, res) => {
         children: [new TextRun({ text: 'EDUCATION', bold: true, size: 24, font: 'Calibri' })]
       }));
       for (const edu of education) {
+        const schoolWithLocation = [edu.school, edu.location].filter(Boolean).join(', ');
         children.push(new Paragraph({
           spacing: { before: 100 },
           children: [
-            new TextRun({ text: edu.school || '', bold: true, size: 22, font: 'Calibri' }),
+            new TextRun({ text: schoolWithLocation || '', bold: true, size: 22, font: 'Calibri' }),
             new TextRun({ text: edu.graduation ? `  —  ${edu.graduation}` : '', size: 22, italics: true, color: '666666', font: 'Calibri' }),
           ]
         }));
