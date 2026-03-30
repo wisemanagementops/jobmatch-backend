@@ -1,0 +1,116 @@
+{
+  "manifest_version": 3,
+  "name": "JobMatch AI - Resume & Job Matcher",
+  "version": "1.2.0",
+  "description": "AI-powered job application assistant with 1-Click Apply. Analyze jobs, get match scores, generate tailored resumes, and autofill applications.",
+  
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting",
+    "contextMenus",
+    "alarms",
+    "clipboardWrite"
+  ],
+  
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "JobMatch AI"
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://jobmatch-frontend-one.vercel.app/*",
+        "https://jobmatch-webapp.vercel.app/*",
+        "http://localhost:5173/*",
+        "http://localhost:3000/*"
+      ],
+      "js": ["content/webapp-auth.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*",
+        "https://linkedin.com/jobs/*",
+        "https://www.linkedin.com/job/*",
+        "https://linkedin.com/job/*",
+        "https://*.linkedin.com/jobs/*",
+        "https://*.linkedin.com/job/*",
+        "https://www.indeed.com/*",
+        "https://indeed.com/*",
+        "https://*.indeed.com/*",
+        "https://www.glassdoor.com/*",
+        "https://glassdoor.com/*",
+        "https://*.glassdoor.com/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://*.lever.co/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://*.workday.com/*"
+      ],
+      "js": ["content/content.js"],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.linkedin.com/*",
+        "https://linkedin.com/*",
+        "https://*.linkedin.com/*",
+        "https://www.indeed.com/*",
+        "https://indeed.com/*",
+        "https://*.indeed.com/*",
+        "https://www.glassdoor.com/*",
+        "https://glassdoor.com/*",
+        "https://*.glassdoor.com/*",
+        "https://boards.greenhouse.io/*",
+        "https://*.greenhouse.io/*",
+        "https://jobs.lever.co/*",
+        "https://*.lever.co/*",
+        "https://*.myworkdayjobs.com/*",
+        "https://*.workday.com/*",
+        "https://*.ashbyhq.com/*",
+        "https://*.breezy.hr/*",
+        "https://*.smartrecruiters.com/*",
+        "https://*.icims.com/*",
+        "https://*.jobvite.com/*",
+        "https://*.taleo.net/*",
+        "https://*.successfactors.com/*"
+      ],
+      "js": ["content/autofill.js", "content/linkedin-handler.js"],
+      "css": ["content/autofill.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "dashboard/*", "profile/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

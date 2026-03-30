@@ -1,0 +1,137 @@
+/* JobMatch AI - Autofill Panel Styles */
+/* Note: Most styles are inline in autofill.js for isolation */
+/* This file contains additional utility styles */
+
+/* Ensure panel is always on top */
+#jobmatch-autofill-panel {
+  isolation: isolate;
+}
+
+/* Highlight animation for filled fields */
+@keyframes jobmatch-highlight {
+  0% {
+    background-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.jobmatch-filled {
+  animation: jobmatch-highlight 1s ease-out;
+}
+
+/* Pulse animation for submit button */
+@keyframes jobmatch-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+}
+
+.jobmatch-submit-highlight {
+  animation: jobmatch-pulse 1.5s infinite;
+}
+
+/* Tooltip for field info */
+.jobmatch-tooltip {
+  position: absolute;
+  background: #1e1b4b;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 2147483646;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.jobmatch-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #1e1b4b transparent transparent;
+}
+
+/* Override any page styles that might interfere */
+#jobmatch-autofill-panel,
+#jobmatch-autofill-panel * {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  box-sizing: border-box !important;
+}
+
+#jobmatch-autofill-panel button {
+  font-family: inherit !important;
+}
+
+/* Notification styles */
+#jobmatch-notification {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Loading spinner */
+.jobmatch-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: jobmatch-spin 0.8s linear infinite;
+}
+
+@keyframes jobmatch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Field detection indicator */
+.jobmatch-field-detected {
+  position: relative;
+}
+
+.jobmatch-field-detected::after {
+  content: '\2713';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #10b981;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+/* Drag handle for panel */
+#jobmatch-autofill-panel .panel-header {
+  cursor: move;
+}
+
+/* Scrollbar styling for fields preview */
+#jobmatch-autofill-panel .fields-preview::-webkit-scrollbar {
+  width: 6px;
+}
+
+#jobmatch-autofill-panel .fields-preview::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+#jobmatch-autofill-panel .fields-preview::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+#jobmatch-autofill-panel .fields-preview::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

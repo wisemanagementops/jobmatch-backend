@@ -1,0 +1,45 @@
+/* JobMatch AI - Content Script Styles */
+
+/* These styles are injected into job posting pages */
+
+#jobmatch-ai-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  cursor: pointer;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+}
+
+#jobmatch-ai-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+#jobmatch-ai-indicator .icon {
+  font-size: 16px;
+}
+
+/* Highlight matching keywords (future feature) */
+.jobmatch-highlight {
+  background: rgba(79, 70, 229, 0.15);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.jobmatch-highlight-missing {
+  background: rgba(245, 158, 11, 0.15);
+  border-radius: 2px;
+  padding: 0 2px;
+}

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobMatch AI - Analysis Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="../lib/docx-parser.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo-icon">🎯</span>
+        <h1>JobMatch AI</h1>
+        <span class="header-subtitle">Analysis Dashboard</span>
+      </div>
+      <div class="header-right">
+        <div class="resume-status" id="resumeStatus">
+          <span class="resume-icon">📄</span>
+          <span id="resumeName">No resume loaded</span>
+          <button id="changeResumeBtn" class="btn btn-small">Change</button>
+        </div>
+        <input type="file" id="resumeInput" accept=".pdf,.docx,.doc,.txt" hidden>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-number" id="queuedCount">0</span>
+        <span class="stat-label">In Queue</span>
+      </div>
+      <div class="stat-card processing">
+        <span class="stat-number" id="processingCount">0</span>
+        <span class="stat-label">Processing</span>
+      </div>
+      <div class="stat-card completed">
+        <span class="stat-number" id="completedCount">0</span>
+        <span class="stat-label">Completed</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="todayCount">0</span>
+        <span class="stat-label">Today</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Left Panel: Job Queue -->
+      <section class="queue-panel">
+        <div class="panel-header">
+          <h2>📋 Job Queue</h2>
+          <button id="clearCompletedBtn" class="btn btn-small btn-secondary">Clear Completed</button>
+        </div>
+
+        <!-- Processing Now -->
+        <div class="queue-section" id="processingSection">
+          <h3 class="section-title">
+            <span class="pulse-dot"></span>
+            Processing Now
+          </h3>
+          <div id="processingList" class="job-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Queued -->
+        <div class="queue-section" id="queuedSection">
+          <h3 class="section-title">⏳ Waiting in Queue</h3>
+          <div id="queuedList" class="job-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="queue-section" id="completedSection">
+          <h3 class="section-title">✅ Completed</h3>
+          <div id="completedList" class="job-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state hidden">
+          <span class="empty-icon">📭</span>
+          <h3>No jobs in queue</h3>
+          <p>Go to any job posting and click the JobMatch AI extension to add jobs for analysis.</p>
+          <div class="supported-sites">
+            <span>Supported sites:</span>
+            <span class="site-badge">LinkedIn</span>
+            <span class="site-badge">Indeed</span>
+            <span class="site-badge">Glassdoor</span>
+            <span class="site-badge">Greenhouse</span>
+            <span class="site-badge">Lever</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Job Details -->
+      <section class="details-panel" id="detailsPanel">
+        <div class="panel-header">
+          <h2>📊 Analysis Results</h2>
+          <button id="closeDetailsBtn" class="btn btn-icon">✕</button>
+        </div>
+
+        <!-- No Selection State -->
+        <div id="noSelectionState" class="no-selection">
+          <span class="no-selection-icon">👈</span>
+          <p>Select a completed job to view its analysis</p>
+        </div>
+
+        <!-- Job Details Content -->
+        <div id="jobDetailsContent" class="job-details hidden">
+          <!-- Job Header -->
+          <div class="job-header">
+            <h3 id="detailJobTitle">Job Title</h3>
+            <p id="detailCompany" class="company-name">Company Name</p>
+            <a id="detailJobLink" href="#" target="_blank" class="job-link">View Original Posting →</a>
+          </div>
+
+          <!-- Score Card -->
+          <div class="score-card">
+            <div class="score-circle">
+              <svg viewBox="0 0 100 100">
+                <circle class="score-bg" cx="50" cy="50" r="45"/>
+                <circle class="score-ring" id="detailScoreRing" cx="50" cy="50" r="45"/>
+              </svg>
+              <span class="score-value" id="detailScore">0</span>
+            </div>
+            <div class="score-info">
+              <span class="score-label" id="detailScoreLabel">Analyzing...</span>
+              <div class="ats-score">
+                <span>ATS Score:</span>
+                <strong id="detailAtsScore">-</strong>%
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Wins -->
+          <div class="detail-section" id="detailQuickWins">
+            <h4>⚡ Quick Wins <span class="selection-hint">(click to select/deselect)</span></h4>
+            <ul id="detailQuickWinsList" class="quick-wins-list selectable-list"></ul>
+          </div>
+
+          <!-- Summary -->
+          <div class="detail-section">
+            <h4>📝 Summary</h4>
+            <p id="detailSummary" class="summary-text"></p>
+          </div>
+
+          <!-- Skills Match -->
+          <div class="detail-section">
+            <h4>✅ Matching Skills</h4>
+            <div id="detailMatchingSkills" class="skills-list"></div>
+          </div>
+
+          <div class="detail-section">
+            <h4>⚠️ Skills to Add <span class="selection-hint">(click to select which ones you have)</span></h4>
+            <p class="skills-instruction">Select only skills you actually have. Selected skills will be added to your tailored resume.</p>
+            <div id="detailMissingSkills" class="skills-list missing selectable-skills"></div>
+          </div>
+
+          <!-- Selection Summary -->
+          <div class="detail-section selection-summary" id="selectionSummary">
+            <div class="selection-count">
+              <span id="selectedSkillsCount">0</span> skills selected · 
+              <span id="selectedWinsCount">0</span> quick wins selected
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="detail-actions">
+            <button id="generateResumeBtn" class="btn btn-primary">
+              📄 Generate Tailored Resume
+            </button>
+            <button id="generateCoverLetterBtn" class="btn btn-secondary">
+              ✉️ Generate Cover Letter
+            </button>
+          </div>
+
+          <!-- Generated Content -->
+          <div id="generatedContent" class="generated-content hidden">
+            <div class="generated-tabs">
+              <button id="tabResume" class="gen-tab active" data-type="resume">
+                📄 Resume
+                <span id="resumeStatus" class="tab-status"></span>
+              </button>
+              <button id="tabCoverLetter" class="gen-tab" data-type="cover_letter">
+                ✉️ Cover Letter
+                <span id="coverLetterStatus" class="tab-status"></span>
+              </button>
+            </div>
+            
+            <!-- Score Improvement (shown after resume generation) -->
+            <div id="scoreImprovement" class="score-improvement hidden">
+              <div class="improvement-header">
+                <span class="improvement-icon">📈</span>
+                <span class="improvement-title">ATS Score Improvement</span>
+              </div>
+              <div class="improvement-scores">
+                <div class="improvement-box original">
+                  <span class="improvement-label">Original</span>
+                  <span id="originalScore" class="improvement-value">--</span>
+                </div>
+                <div class="improvement-arrow">→</div>
+                <div class="improvement-box improved">
+                  <span class="improvement-label">Improved</span>
+                  <span id="improvedScore" class="improvement-value">--</span>
+                </div>
+                <div class="improvement-box change">
+                  <span class="improvement-label">Change</span>
+                  <span id="scoreChange" class="improvement-value">--</span>
+                </div>
+              </div>
+              <div id="improvementAnalyzing" class="improvement-analyzing hidden">
+                <span class="spinner-small"></span>
+                <span>Analyzing improved resume...</span>
+              </div>
+            </div>
+            
+            <div id="generatedPreview" class="generated-preview formatted-resume"></div>
+            <div class="generated-actions">
+              <button id="copyGeneratedBtn" class="btn btn-small">📋 Copy</button>
+              <button id="downloadTxtBtn" class="btn btn-small">📄 TXT</button>
+              <button id="downloadDocxBtn" class="btn btn-small">📝 DOCX</button>
+              <button id="downloadPdfBtn" class="btn btn-small btn-primary">📥 PDF</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-left">
+        <span id="usageInfo">Free: 5 analyses left</span>
+      </div>
+      <div class="footer-right">
+        <a href="#" id="upgradeLink" class="footer-link">⭐ Upgrade to Pro</a>
+      </div>
+    </footer>
+
+    <!-- Upgrade Modal -->
+    <div id="upgradeModal" class="modal hidden">
+      <div class="modal-content upgrade-modal">
+        <button id="closeUpgradeBtn" class="modal-close">✕</button>
+        
+        <div class="upgrade-header">
+          <h2>⭐ Upgrade to JobMatch AI Pro</h2>
+          <p>Unlock unlimited job analyses and premium features</p>
+        </div>
+
+        <div class="pricing-cards">
+          <!-- Free Plan -->
+          <div class="pricing-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">$0</div>
+            <div class="plan-period">forever</div>
+            <ul class="plan-features">
+              <li>✓ 5 job analyses per day</li>
+              <li>✓ Basic match scoring</li>
+              <li>✓ Skills gap analysis</li>
+              <li>✗ Tailored resumes</li>
+              <li>✗ Cover letter generation</li>
+              <li>✗ Priority support</li>
+            </ul>
+            <button class="btn btn-secondary" disabled>Current Plan</button>
+          </div>
+
+          <!-- Pro Plan -->
+          <div class="pricing-card featured">
+            <div class="plan-badge">MOST POPULAR</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">$9.99</div>
+            <div class="plan-period">per month</div>
+            <ul class="plan-features">
+              <li>✓ <strong>Unlimited</strong> job analyses</li>
+              <li>✓ Advanced ATS scoring</li>
+              <li>✓ Skills gap analysis</li>
+              <li>✓ <strong>Unlimited</strong> tailored resumes</li>
+              <li>✓ <strong>Unlimited</strong> cover letters</li>
+              <li>✓ Priority email support</li>
+            </ul>
+            <button id="selectProMonthly" class="btn btn-primary">Select Plan</button>
+          </div>
+
+          <!-- Pro Annual -->
+          <div class="pricing-card">
+            <div class="plan-badge save">SAVE 40%</div>
+            <div class="plan-name">Pro Annual</div>
+            <div class="plan-price">$5.99</div>
+            <div class="plan-period">per month, billed $71.88/year</div>
+            <ul class="plan-features">
+              <li>✓ <strong>Unlimited</strong> job analyses</li>
+              <li>✓ Advanced ATS scoring</li>
+              <li>✓ Skills gap analysis</li>
+              <li>✓ <strong>Unlimited</strong> tailored resumes</li>
+              <li>✓ <strong>Unlimited</strong> cover letters</li>
+              <li>✓ Priority email support</li>
+            </ul>
+            <button id="selectProAnnual" class="btn btn-secondary">Select Plan</button>
+          </div>
+        </div>
+
+        <p class="payment-note">🔒 Secure payment powered by Stripe. Cancel anytime.</p>
+      </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal hidden">
+      <div class="modal-content checkout-modal">
+        <button id="closeCheckoutBtn" class="modal-close">✕</button>
+        
+        <div class="checkout-header">
+          <h2>💳 Complete Your Purchase</h2>
+          <p id="checkoutPlanName">Pro Monthly - $9.99/month</p>
+        </div>
+
+        <form id="checkoutForm" class="checkout-form">
+          <div class="form-section">
+            <h3>Contact Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" required placeholder="John">
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" required placeholder="Doe">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" required placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="+1 (555) 123-4567">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Billing Address</h3>
+            <div class="form-group">
+              <label for="address">Street Address *</label>
+              <input type="text" id="address" required placeholder="123 Main St">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" required placeholder="New York">
+              </div>
+              <div class="form-group">
+                <label for="state">State/Province *</label>
+                <input type="text" id="state" required placeholder="NY">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="zip">ZIP/Postal Code *</label>
+                <input type="text" id="zip" required placeholder="10001">
+              </div>
+              <div class="form-group">
+                <label for="country">Country *</label>
+                <select id="country" required>
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="AU">Australia</option>
+                  <option value="DE">Germany</option>
+                  <option value="FR">France</option>
+                  <option value="IN">India</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section order-summary">
+            <h3>Order Summary</h3>
+            <div class="summary-line">
+              <span id="summaryPlan">Pro Monthly Plan</span>
+              <span id="summaryPrice">$9.99</span>
+            </div>
+            <div class="summary-line total">
+              <span>Total</span>
+              <span id="summaryTotal">$9.99</span>
+            </div>
+          </div>
+
+          <div class="checkout-actions">
+            <button type="button" id="backToPlans" class="btn btn-secondary">← Back</button>
+            <button type="submit" id="proceedToPayment" class="btn btn-primary btn-large">
+              🔒 Proceed to Payment
+            </button>
+          </div>
+        </form>
+
+        <p class="checkout-note">
+          By proceeding, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          You will be redirected to Stripe's secure payment page.
+        </p>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal hidden">
+      <div class="modal-content success-modal">
+        <div class="success-icon">🎉</div>
+        <h2>Welcome to Pro!</h2>
+        <p>Thank you for upgrading! Your account has been activated.</p>
+        <div class="success-details">
+          <p>✓ Unlimited job analyses</p>
+          <p>✓ Tailored resume generation</p>
+          <p>✓ Cover letter generation</p>
+          <p>✓ Priority support</p>
+        </div>
+        <p class="receipt-note">A confirmation email with your receipt has been sent to <strong id="receiptEmail">your email</strong>.</p>
+        <button id="closeSuccessBtn" class="btn btn-primary">Start Using Pro Features</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

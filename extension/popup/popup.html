@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JobMatch AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">🎯</div>
+        <span class="logo-text">JobMatch AI</span>
+      </div>
+      <div class="header-actions">
+        <button id="refreshBtn" class="icon-btn" title="Refresh">🔄</button>
+        <button id="dashboardBtn" class="icon-btn" title="Dashboard">📊</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+      
+      <!-- Loading State -->
+      <div id="loadingState" class="state">
+        <div class="state-content">
+          <div class="spinner"></div>
+          <p class="state-text">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Not Logged In -->
+      <div id="notAuthState" class="state hidden">
+        <div class="state-content">
+          <div class="state-icon">🔐</div>
+          <h2 class="state-title">Sign In Required</h2>
+          <p class="state-desc">Sign in on the website to use the extension</p>
+          <button id="openWebsiteBtn" class="btn btn-primary">Open Website</button>
+          <button id="refreshAuthBtn" class="btn btn-ghost">Check Again</button>
+        </div>
+      </div>
+      
+      <!-- No Resume -->
+      <div id="noResumeState" class="state hidden">
+        <div class="state-content">
+          <div class="state-icon">📄</div>
+          <h2 class="state-title">Upload Resume First</h2>
+          <p class="state-desc">Create or upload a resume to start analyzing jobs</p>
+          <button id="createResumeBtn" class="btn btn-primary">Create Resume</button>
+        </div>
+      </div>
+
+      <!-- Ready State -->
+      <div id="readyState" class="state hidden">
+        <!-- Resume Selector -->
+        <div class="resume-selector">
+          <label class="selector-label">Using resume:</label>
+          <select id="resumeSelect" class="resume-select">
+            <option value="">Select resume...</option>
+          </select>
+        </div>
+        
+        <!-- Job Card -->
+        <div id="jobCard" class="job-card">
+          <div class="job-card-header">
+            <span class="job-badge">✓ Job Detected</span>
+          </div>
+          <h3 id="previewJobTitle" class="job-title">Loading...</h3>
+          <p id="previewCompany" class="job-company"></p>
+        </div>
+
+        <!-- Action Button -->
+        <button id="addToQueueBtn" class="btn btn-primary btn-full">
+          <span>⚡</span> Analyze This Job
+        </button>
+        
+        <!-- Queue Status -->
+        <div class="queue-bar">
+          <div class="queue-item">
+            <span id="queuedCount" class="queue-num">0</span>
+            <span class="queue-label">Queued</span>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-item active">
+            <span id="processingCount" class="queue-num">0</span>
+            <span class="queue-label">Processing</span>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-item done">
+            <span id="completedCount" class="queue-num">0</span>
+            <span class="queue-label">Done</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Link -->
+        <button id="openDashboardBtn" class="btn btn-ghost btn-full">
+          View Results in Dashboard →
+        </button>
+        
+        <p class="hint" id="statusHint">Analysis runs in background</p>
+      </div>
+
+      <!-- Adding State -->
+      <div id="addingState" class="state hidden">
+        <div class="state-content">
+          <div class="spinner"></div>
+          <p class="state-text">Adding to queue...</p>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div id="addedState" class="state hidden">
+        <div class="state-content">
+          <div class="state-icon success">✅</div>
+          <h2 class="state-title">Added to Queue!</h2>
+          <p class="state-desc" id="addedMessage">Analyzing in background...</p>
+          <div class="state-actions">
+            <button id="addAnotherBtn" class="btn btn-secondary">Add Another</button>
+            <button id="viewDashboardBtn" class="btn btn-primary">View Results</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Not on Job Page -->
+      <div id="notJobPageState" class="state hidden">
+        <div class="state-content">
+          <div class="state-icon">🔍</div>
+          <h2 class="state-title">Navigate to a Job</h2>
+          <p class="state-desc">Open a job listing to analyze it</p>
+          <div class="sites-list">
+            <span class="site-tag">LinkedIn</span>
+            <span class="site-tag">Indeed</span>
+            <span class="site-tag">Glassdoor</span>
+            <span class="site-tag">Greenhouse</span>
+            <span class="site-tag">Lever</span>
+          </div>
+          <button id="openDashboardBtn2" class="btn btn-ghost btn-full">
+            Open Dashboard →
+          </button>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" class="state hidden">
+        <div class="state-content">
+          <div class="state-icon error">⚠️</div>
+          <h2 class="state-title">Something Went Wrong</h2>
+          <p class="state-desc" id="errorMessage">Please try again</p>
+          <button id="retryBtn" class="btn btn-primary">Try Again</button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span id="usageInfo" class="usage-info">-</span>
+      <span id="userEmail" class="user-email"></span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
